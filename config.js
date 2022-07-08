@@ -9,11 +9,11 @@ global.owner = [
   ['+6289524208209'],
   ['+6289524208209'],
   ['+6289524208209'],
-  ['+6289524208209', 'Hanz', true],
-  ['6289524208209', 'yng mau masukin  bot ke grup chat dia', true],
+  ['+6289524208209', '', true],
+  ['0', '', true],
   ['+6281779211748', 'Bot', true],
-  ['+6289524208209', 'yng mau masukin bot ke grup chat dia', true],
-  ['+6289524208209', 'yng mau masukin bot ke grup chat dia', true],
+  ['+0', '', true],
+  ['+0', '', true],
   // [number, dia creator/owner?, dia developer?]
 ] // Put your number here
 global.mods = [] // Want some help?
