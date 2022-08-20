@@ -495,40 +495,59 @@ export async function handler(chatUpdate) {
                 let chat = global.db.data.chats[m.chat]
                 if (typeof chat !== 'object') global.db.data.chats[m.chat] = {}
                 if (chat) {
-	                if (!('isBanned' in chat)) chat.isBanned = false
-	                if (!('welcome' in chat)) chat.welcome = true
-	                if (!('detect' in chat)) chat.detect = false
-	                if (!('sWelcome' in chat)) chat.sWelcome = ''
-	                if (!('sBye' in chat)) chat.sBye = ''
-	                if (!('sPromote' in chat)) chat.sPromote = ''
-	                if (!('sDemote' in chat)) chat.sDemote = ''
-	                if (!('antiDelete' in chat)) chat.antiDelete = false
-	                if (!('antiLink' in chat)) chat.antiLink = false
-	                if (!('viewOnce' in chat)) chat.viewOnce = false
-			if (!('nsfw' in chat)) chat.nsfw = false
-                        if (!('premnsfw' in chat)) chat.premnsfw = false
-			if (!('premium' in chat)) chat.premium = false
-                        if (!('premiumTime' in chat)) chat.premiumTime = false
-                        if (!('simi' in chat)) chat.simi = false
-	                if (!isNumber(chat.expired)) chat.expired = 0
-	            } else global.db.data.chats[m.chat] = {
+	            if (!('antiDelete' in chat)) chat.antiDelete = false
+                if (!('antiLink' in chat)) chat.antiLink = true
+                if (!('antiSticker' in chat)) chat.antiSticker = false
+                if (!('antiToxic' in chat)) chat.antiToxic = false
+                if (!('delete' in chat)) chat.delete = false
+                if (!('detect' in chat)) chat.detect = true
+                if (!('getmsg' in chat)) chat.getmsg = true
+                if (!('isBanned' in chat)) chat.isBanned = false
+                if (!('lastAnime' in chat)) chat.lastAnime = true
+                if (!('latestNews' in chat)) chat.latestNews = true
+                if (!('nsfw' in chat)) chat.nsfw = false
+                if (!('premium' in chat)) chat.premium = false
+                if (!('premiumTime' in chat)) chat.premiumTime = false
+                if (!('premnsfw' in chat)) chat.premnsfw = false
+                if (!('sBye' in chat)) chat.sBye = ''
+                if (!('sDemote' in chat)) chat.sDemote = ''
+                if (!('simi' in chat)) chat.simi = false
+                if (!('sPromote' in chat)) chat.sPromote = ''
+                if (!('stiker' in chat)) chat.stiker = false
+                if (!('sWelcome' in chat)) chat.sWelcome = ''
+                if (!('useDocument' in chat)) chat.useDocument = false
+                if (!('viewonce' in chat)) chat.viewonce = false
+                if (!('viewOnce' in chat)) chat.viewOnce = false
+                if (!('welcome' in chat)) chat.welcome = true
+                if (!isNumber(chat.expired)) chat.expired = 0
+            } else
+                global.db.data.chats[m.chat] = {
+                    antiDelete: false,
+	                antiLink: true,
+	                antiSticker: false,
+	                antiToxic: false,
+	                delete: false,
+	                detect: true,
+	                expired: 0,
+	                getmsg: true,
 	                isBanned: false,
-	                welcome: true,
-	                detect: false,
-	                sWelcome: '',
+	                lastAnime: true,
+	                latestNews: true,
+	                nsfw: false,
+	                premium: false,
+	                premiumTime: false,
+	                premnsfw: false,
 	                sBye: '',
-	                sPromote: '',
 	                sDemote: '',
-	                antiDelete: false,
-	                antiLink: false,
+	                simi: false,
+	                sPromote: '',
+	                stiker: false,
+	                sWelcome: '',
+	                useDocument: false,
 	                viewOnce: false,
-			simi: false,
-                        nsfw: false,
-                        premnsfw: false,
-			premium: false,
-			premiumTime: false,
-	                expired: 0
-	            }
+	                viewonce: false,
+	                welcome: true,
+                }
             }
             let settings = global.db.data.settings[this.user.jid]
             if (typeof settings !== 'object') global.db.data.settings[this.user.jid] = {}
@@ -855,9 +874,10 @@ export async function participantsUpdate({ id, participants, action }) {
                 .toAttachment()
                             
                         // this.sendFile(id, action === 'add' ? wel : lea, pp, 'pp.jpg', text, null, false, { mentions: [user] })
-                       await this.sendHydrated(id, text, wm, action === 'add' ? wel.toBuffer() : lea.toBuffer(), sgc, (action == 'add' ? ' Welcome 👋' : 'Sayonaraa 👋'), user.split`@`[0], 'USER NUMBER', [
-      [null, null],
-      [null, null]
+                       await this.sendHydrated(id, text, wm, action === 'add' ? wel.toBuffer() : lea.toBuffer(), sgc, (action == 'add' ? ' ᴡᴇʟᴄᴏᴍᴇ 👋' : 'sᴀʏᴏɴᴀʀᴀ 👋'), user.split`@`[0], 'ᴜsᴇʀ ɴᴜᴍʙᴇʀ', [
+      ['🐦ᴍᴇɴᴜ', '.menu'],
+      ['⚡ᴘɪɴɢ', '.ping'],
+      ['👋ᴡᴇʟᴄᴏᴍᴇ', 'Huuu'],
     ], null, false, { mentions: [user] })
                     }
                 }
@@ -870,6 +890,32 @@ export async function participantsUpdate({ id, participants, action }) {
             text = text.replace('@user', '@' + participants[0].split('@')[0])
             if (chat.detect) this.sendMessage(id, { text, mentions: this.parseMention(text) })
         break
+    }
+}
+
+/**
+ * Handle groups update
+ * @param {import('@adiwajshing/baileys').BaileysEventMap<unknown>['groups.update']} groupsUpdate 
+ */
+export async function groupsUpdate(groupsUpdate) {
+   if (opts['self']) return
+    for (const groupUpdate of groupsUpdate) {
+        const id = groupUpdate.id
+        if (!id) continue
+        let chats = global.db.data.chats[id], text = ''
+        if (!chats?.detect) continue
+            if (groupUpdate.desc) text = (chats.sDesc || this.sDesc || conn.sDesc || '*ᴅᴇsᴄʀɪᴘᴛɪᴏɴ ʜᴀs ʙᴇᴇɴ ᴄʜᴀɴɢᴇᴅ ᴛᴏ*\n@desc').replace('@desc', groupUpdate.desc)
+            if (groupUpdate.subject) text = (chats.sSubject || this.sSubject || conn.sSubject || '*sᴜʙᴊᴇᴄᴛ ʜᴀs ʙᴇᴇɴ ᴄʜᴀɴɢᴇᴅ ᴛᴏ*\n@subject').replace('@subject', groupUpdate.subject)
+            if (groupUpdate.icon) text = (chats.sIcon || this.sIcon || conn.sIcon || '*ɪᴄᴏɴ ʜᴀs ʙᴇᴇɴ ᴄʜᴀɴɢᴇᴅ*').replace('@icon', groupUpdate.icon)
+            if (groupUpdate.revoke) text = (chats.sRevoke || this.sRevoke || conn.sRevoke || '*ɢʀᴏᴜᴘ ʟɪɴᴋ ʜᴀs ʙᴇᴇɴ ᴄʜᴀɴɢᴇᴅ ᴛᴏ*\n@revoke').replace('@revoke', groupUpdate.revoke)
+            if (groupUpdate.announce == true) text = (chats.sAnnounceOn || this.sAnnounceOn || conn.sAnnounceOn || '*ɢʀᴏᴜᴘ ʜᴀs ʙᴇᴇɴ ᴄʟᴏsᴇᴅ!*')
+            if (groupUpdate.announce == false) text = (chats.sAnnounceOff || this.sAnnounceOff || conn.sAnnounceOff || '*ɢʀᴏᴜᴘ ʜᴀs ʙᴇᴇɴ ᴏᴘᴇɴ!*')
+            if (groupUpdate.restrict == true) text = (chats.sRestrictOn || this.sRestrictOn || conn.sRestrictOn || '*ɢʀᴏᴜᴘ ʜᴀs ʙᴇᴇɴ ᴀʟʟ ᴘᴀʀᴛɪᴄɪᴘᴀɴs!*')
+            if (groupUpdate.restrict == false) text = (chats.sRestrictOff || this.sRestrictOff || conn.sRestrictOff || '*ɢʀᴏᴜᴘ ʜᴀs ʙᴇᴇɴ ᴏɴʟʏ ᴀᴅᴍɪɴ!*')
+            if (!text) continue
+            this.sendHydrated(id, text.trim(), wm, logo, null, null, nomorown, nameown, [
+      ['🔖Ok', 'Huuu']
+    ], null)
     }
 }
 
@@ -894,18 +940,22 @@ To turn off this feature, type
 
 global.dfail = (type, m, conn) => {
     let msg = {
-        rowner: 'This command can only be used by _*OWWNER!1!1!*_',
-        owner: 'This command can only be used by _*Owner Bot*_!',
-        mods: 'This command can only be used by _*Moderator*_ !',
-        premium: 'This command is only for _*Premium*_ members!',
-        group: 'This command can only be used in groups!',
-        private: 'This command can only be used in Private Chat!',
-        admin: 'This command is only for *Admin* group!',
-        botAdmin: 'Make bot as *Admin* to use this command!',
-        unreg: 'Silahkan daftar untuk menggunakan fitur ini dengan cara mengetik:\n\n*#daftar nama.umur*\n\nContoh: *#daftar Manusia.16*',
-        restrict: 'This feature is *disabled*!'
+        rowner: '*ᴏɴʟʏ ᴅᴇᴠᴇʟᴏᴘᴇʀ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ᴜɴᴛᴜᴋ ᴅᴇᴠᴇʟᴏᴘᴇʀ ʙᴏᴛ',
+        owner: '*ᴏɴʟʏ ᴏᴡɴᴇʀ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ᴜɴᴛᴜᴋ ᴏᴡɴᴇʀ ʙᴏᴛ',
+        mods: '*ᴏɴʟʏ ᴍᴏᴅᴇʀᴀᴛᴏʀ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ᴜɴᴛᴜᴋ ᴍᴏᴅᴇʀᴀᴛᴏʀ ʙᴏᴛ',
+        premium: '*ᴏɴʟʏ ᴘʀᴇᴍɪᴜᴍ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ᴜɴᴛᴜᴋ ᴘʀᴇᴍɪᴜᴍ ᴜsᴇʀ',
+        group: '*ɢʀᴏᴜᴘ ᴄʜᴀᴛ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ʙɪsᴀ ᴅɪᴘᴀᴋᴀɪ ᴅɪᴅᴀʟᴀᴍ ɢʀᴏᴜᴘ',
+        private: '*ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ʙɪsᴀ ᴅɪᴘᴀᴋᴀɪ ᴅɪᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ',
+        admin: '*ᴏɴʟʏ ᴀᴅᴍɪɴ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ᴜɴᴛᴜᴋ ᴀᴅᴍɪɴ ɢʀᴏᴜᴘ',
+        botAdmin: '*ᴏɴʟʏ ʙᴏᴛ ᴀᴅᴍɪɴ* • ᴄᴏᴍᴍᴀɴᴅ ɪɴɪ ʜᴀɴʏᴀ ʙɪsᴀ ᴅɪɢᴜɴᴀᴋᴀɴ ᴋᴇᴛɪᴋᴀ ʙᴏᴛ ᴍᴇɴᴊᴀᴅɪ ᴀᴅᴍɪɴ',
+        restrict: '*ʀᴇsᴛʀɪᴄᴛ* • ʀᴇsᴛʀɪᴄᴛ ʙᴇʟᴜᴍ ᴅɪɴʏᴀʟᴀᴋᴀɴ ᴅɪᴄʜᴀᴛ ɪɴɪ',
     }[type]
-    if (msg) return conn.reply(m.chat, msg, m, { contextInfo: { externalAdReply: {title: global.wm, body: '404 Access denied!', sourceUrl: sgc, thumbnail: fs.readFileSync('./thumbnail.jpg') }}})
+    if (msg) return conn.reply(m.chat, msg, m, { contextInfo: { externalAdReply: {title: global.wm, body: '404 Access denied ✘', sourceUrl: global.sgc, thumbnail: fs.readFileSync('./thumbnail.jpg') }}})
+    
+    let msgg = {
+    	unreg: 'Silahkan daftar untuk menggunakan fitur ini dengan cara mengetik:\n\n*#daftar nama.umur*\n\nContoh: *#daftar Manusia.16*\n➞ ᴋʟɪᴄᴋ ᴛᴏᴍʙᴏʟ ᴅɪʙᴀᴡᴀʜ ᴜɴᴛᴜᴋ ᴍᴇɴᴅᴀғᴛᴀʀ ᴋᴇ ᴅᴀᴛᴀʙᴀsᴇ ʙᴏᴛ'
+}[type]
+if (msgg) return conn.sendButton(m.chat, `${global.htki} VERIFY ${global.htka}`, msgg, null, ['- ᴠᴇʀɪғʏ -', '/verify'],m)
 }
 
 let file = global.__filename(import.meta.url, true)
