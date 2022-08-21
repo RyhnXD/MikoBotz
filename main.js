@@ -26,7 +26,7 @@ import pino from 'pino'
 import {
   mongoDB,
   mongoDBV2
-} from './lib/mongoDB.js'
+} from './lib/mongoDB.js';
 const {
   useSingleFileAuthState,
   DisconnectReason
